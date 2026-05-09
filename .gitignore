@@ -1,4 +1,5 @@
 # globs
+.env
 Makefile.in
 *.userprefs
 *.usertasks
