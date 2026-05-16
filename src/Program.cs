@@ -2,6 +2,7 @@ using System.ClientModel;
 using OpenAI;
 using OpenAI.Chat;
 
+
 if (args.Length < 2 || args[0] != "-p") {
     throw new Exception("Usage: program -p <prompt>");
 }
