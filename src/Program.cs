@@ -2,23 +2,20 @@ using System.ClientModel;
 using OpenAI;
 using OpenAI.Chat;
 
-if (args.Length < 2 || args[0] != "-p")
-{
+if (args.Length < 2 || args[0] != "-p") {
     throw new Exception("Usage: program -p <prompt>");
 }
 
 var prompt = args[1];
 
-if (string.IsNullOrEmpty(prompt))
-{
+if (string.IsNullOrEmpty(prompt)) {
     throw new Exception("Prompt must not be empty");
 }
 
 var apiKey = Environment.GetEnvironmentVariable("OPENROUTER_API_KEY");
 var baseUrl = Environment.GetEnvironmentVariable("OPENROUTER_BASE_URL") ?? "https://openrouter.ai/api/v1";
 
-if (string.IsNullOrEmpty(apiKey))
-{
+if (string.IsNullOrEmpty(apiKey)) {
     throw new Exception("OPENROUTER_API_KEY is not set");
 }
 
@@ -32,8 +29,7 @@ ChatCompletion response = client.CompleteChat(
     [new UserChatMessage(prompt)]
 );
 
-if (response.Content == null || response.Content.Count == 0)
-{
+if (response.Content == null || response.Content.Count == 0) {
     throw new Exception("No choices in response");
 }
 
