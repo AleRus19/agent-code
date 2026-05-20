@@ -33,7 +33,8 @@ var options = new ChatCompletionOptions {
 
 
 ChatCompletion response = client.CompleteChat(
-    [new UserChatMessage(prompt)]
+    [new UserChatMessage(prompt)],
+    options: options
 );
 
 if (response.Content == null || response.Content.Count == 0) {
