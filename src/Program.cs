@@ -1,7 +1,7 @@
 using System.ClientModel;
 using OpenAI;
 using OpenAI.Chat;
-
+using static Agent.Tools;
 
 if (args.Length < 2 || args[0] != "-p") {
     throw new Exception("Usage: program -p <prompt>");
@@ -26,11 +26,9 @@ var client = new ChatClient(
     options: new OpenAIClientOptions { Endpoint = new Uri(baseUrl) }
 );
 
-
 var options = new ChatCompletionOptions {
-    Tools = { Agent.Tools.ReadTool.GetChatTool() }
+    Tools = { ReadTool.GetChatTool() }
 };
-
 
 ChatCompletion response = client.CompleteChat(
     [new UserChatMessage(prompt)],
