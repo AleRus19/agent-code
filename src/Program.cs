@@ -26,6 +26,12 @@ var client = new ChatClient(
     options: new OpenAIClientOptions { Endpoint = new Uri(baseUrl) }
 );
 
+
+var options = new ChatCompletionOptions {
+    Tools = { Agent.Tools.ReadTool.GetChatTool() }
+};
+
+
 ChatCompletion response = client.CompleteChat(
     [new UserChatMessage(prompt)]
 );
