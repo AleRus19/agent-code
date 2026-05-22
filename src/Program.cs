@@ -62,8 +62,7 @@ while (true) {
                     var content = param["content"];
                     var path = param["file_path"];
 
-                    var streamWriter = File.CreateText(path);
-                    await streamWriter.WriteLineAsync(content);
+                    await File.WriteAllTextAsync(path, content);
                     messages.Add(new ToolChatMessage(toolCallRequest.Id, $"write successful"));
 
                     break;
