@@ -5,9 +5,9 @@ namespace Agent;
 
 public static class Tools {
     public static class ReadTool {
-        const string name = "Read";
-        const string description = "Read and return the contents of a file";
-        const string param =
+        public const string Name = "read";
+        const string Description = "Read and return the contents of a file";
+        const string Param =
         """
             {
                 "type": "object",
@@ -23,9 +23,9 @@ public static class Tools {
 
         public static ChatTool GetChatTool() =>
             ChatTool.CreateFunctionTool(
-                functionName: name,
-                functionDescription: description,
-                functionParameters: BinaryData.FromString(param)
+                functionName: Name,
+                functionDescription: Description,
+                functionParameters: BinaryData.FromString(Param)
             );
     }
 }

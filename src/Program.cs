@@ -39,6 +39,18 @@ if (response.Content == null || response.Content.Count == 0) {
     throw new Exception("No choices in response");
 }
 
+if (response.FinishReason == ChatFinishReason.ToolCalls) {
+    foreach (var toolCallRequest in response.ToolCalls) {
+        if (toolCallRequest.FunctionName == ReadTool.Name) {
+            var param = toolCallRequest.FunctionArguments.ToObjectFromJson<Dictionary<string, string>>() ?? [];
+            if (param.TryGetValue("file_path", out var p)) {
+                var content = await File.ReadAllTextAsync(p);
+                Console.WriteLine(content);
+            }
+        }
+    }
+}
+
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 Console.Error.WriteLine("Logs from your program will appear here!");
 
