@@ -1,5 +1,6 @@
 using System.ClientModel;
 using OpenAI;
+using OpenAI.Assistants;
 using OpenAI.Chat;
 using static Agent.Tools;
 
@@ -30,26 +31,31 @@ var options = new ChatCompletionOptions {
     Tools = { ReadTool.GetChatTool() }
 };
 
-ChatCompletion response = client.CompleteChat(
-    [new UserChatMessage(prompt)],
-    options: options
-);
+List<ChatMessage> messages = [new UserChatMessage(prompt)];
 
-if (response.FinishReason == ChatFinishReason.ToolCalls) {
-    foreach (var toolCallRequest in response.ToolCalls) {
-        if (toolCallRequest.FunctionName == ReadTool.Name) {
-            var param = toolCallRequest.FunctionArguments.ToObjectFromJson<Dictionary<string, string>>() ?? [];
-            if (param.TryGetValue("file_path", out var p)) {
-                var content = await File.ReadAllTextAsync(p);
-                Console.WriteLine(content);
-                return;
+while (true) {
+
+    ChatCompletion response = client.CompleteChat(
+        messages,
+        options: options
+    );
+
+    if (response.FinishReason == ChatFinishReason.Stop) {
+        messages.Add(new AssistantChatMessage(response));
+        Console.Write(response.Content[0].Text);
+        return;
+    }
+
+    if (response.FinishReason == ChatFinishReason.ToolCalls) {
+        foreach (var toolCallRequest in response.ToolCalls) {
+            messages.Add(new AssistantChatMessage(response));
+            if (toolCallRequest.FunctionName == ReadTool.Name) {
+                var param = toolCallRequest.FunctionArguments.ToObjectFromJson<Dictionary<string, string>>() ?? [];
+                if (param.TryGetValue("file_path", out var p)) {
+                    var content = await File.ReadAllTextAsync(p);
+                    messages.Add(new ToolChatMessage(toolCallRequest.Id, content));
+                }
             }
         }
     }
 }
-
-// You can use print statements as follows for debugging, they'll be visible when running tests.
-Console.Error.WriteLine("Logs from your program will appear here!");
-
-// TODO: Uncomment the line below to pass the first stage
-Console.Write(response.Content[0].Text);
