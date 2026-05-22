@@ -42,6 +42,7 @@ if (response.FinishReason == ChatFinishReason.ToolCalls) {
             if (param.TryGetValue("file_path", out var p)) {
                 var content = await File.ReadAllTextAsync(p);
                 Console.WriteLine(content);
+                return;
             }
         }
     }
