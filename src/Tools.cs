@@ -28,4 +28,33 @@ public static class Tools {
                 functionParameters: BinaryData.FromString(Param)
             );
     }
+
+    public static class WriteTool {
+        public const string Name = "write";
+        const string Description = "Write content to a file";
+        const string Param =
+        """
+            {
+                "type": "object",
+                "required": ["file_path", "content"],
+                "properties": {
+                    "file_path": {
+                        "type": "string",
+                        "description": "The path of the file to write to"
+                    },
+                    "content": {
+                        "type": "string",
+                        "description": "The content to write to the file"
+                    }
+                }
+            }
+        """;
+
+        public static ChatTool GetChatTool() =>
+            ChatTool.CreateFunctionTool(
+                functionName: Name,
+                functionDescription: Description,
+                functionParameters: BinaryData.FromString(Param)
+            );
+    }
 }

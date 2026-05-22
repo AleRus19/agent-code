@@ -1,4 +1,5 @@
 using System.ClientModel;
+using System.Data.SqlTypes;
 using OpenAI;
 using OpenAI.Assistants;
 using OpenAI.Chat;
@@ -28,7 +29,7 @@ var client = new ChatClient(
 );
 
 var options = new ChatCompletionOptions {
-    Tools = { ReadTool.GetChatTool() }
+    Tools = { ReadTool.GetChatTool(), WriteTool.GetChatTool() }
 };
 
 List<ChatMessage> messages = [new UserChatMessage(prompt)];
@@ -49,12 +50,23 @@ while (true) {
     if (response.FinishReason == ChatFinishReason.ToolCalls) {
         foreach (var toolCallRequest in response.ToolCalls) {
             messages.Add(new AssistantChatMessage(response));
-            if (toolCallRequest.FunctionName == ReadTool.Name) {
-                var param = toolCallRequest.FunctionArguments.ToObjectFromJson<Dictionary<string, string>>() ?? [];
-                if (param.TryGetValue("file_path", out var p)) {
-                    var content = await File.ReadAllTextAsync(p);
-                    messages.Add(new ToolChatMessage(toolCallRequest.Id, content));
-                }
+            var param = toolCallRequest.FunctionArguments.ToObjectFromJson<Dictionary<string, string>>() ?? [];
+
+            switch (toolCallRequest.FunctionName) {
+                case ReadTool.Name:
+                    if (param.TryGetValue("file_path", out var p)) {
+                        messages.Add(new ToolChatMessage(toolCallRequest.Id, await File.ReadAllTextAsync(p)));
+                    }
+                    break;
+                case WriteTool.Name:
+                    var content = param["content"];
+                    var path = param["file_path"];
+
+                    var streamWriter = File.CreateText(path);
+                    await streamWriter.WriteLineAsync(content);
+                    messages.Add(new ToolChatMessage(toolCallRequest.Id, $"write successful"));
+
+                    break;
             }
         }
     }
