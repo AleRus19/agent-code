@@ -35,10 +35,6 @@ ChatCompletion response = client.CompleteChat(
     options: options
 );
 
-if (response.Content == null || response.Content.Count == 0) {
-    throw new Exception("No choices in response");
-}
-
 if (response.FinishReason == ChatFinishReason.ToolCalls) {
     foreach (var toolCallRequest in response.ToolCalls) {
         if (toolCallRequest.FunctionName == ReadTool.Name) {
