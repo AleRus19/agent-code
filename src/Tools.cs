@@ -57,4 +57,29 @@ public static class Tools {
                 functionParameters: BinaryData.FromString(Param)
             );
     }
+
+    public static class BashTool {
+        public const string Name = "bash";
+        const string Description = "Execute a shell command";
+        const string Param =
+        """
+            {
+                "type": "object",
+                "required": ["command"],
+                "properties": {
+                    "command": {
+                        "type": "string",
+                        "description": "The command to execute"
+                    }
+                }
+            }
+        """;
+
+        public static ChatTool GetChatTool() =>
+            ChatTool.CreateFunctionTool(
+                functionName: Name,
+                functionDescription: Description,
+                functionParameters: BinaryData.FromString(Param)
+            );
+    }
 }

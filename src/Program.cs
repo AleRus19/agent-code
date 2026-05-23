@@ -1,5 +1,6 @@
 using System.ClientModel;
 using System.Data.SqlTypes;
+using System.Diagnostics;
 using OpenAI;
 using OpenAI.Assistants;
 using OpenAI.Chat;
@@ -29,7 +30,7 @@ var client = new ChatClient(
 );
 
 var options = new ChatCompletionOptions {
-    Tools = { ReadTool.GetChatTool(), WriteTool.GetChatTool() }
+    Tools = { ReadTool.GetChatTool(), WriteTool.GetChatTool(), BashTool.GetChatTool() }
 };
 
 List<ChatMessage> messages = [new UserChatMessage(prompt)];
@@ -65,6 +66,26 @@ while (true) {
                     await File.WriteAllTextAsync(path, content);
                     messages.Add(new ToolChatMessage(toolCallRequest.Id, $"write successful"));
 
+                    break;
+                case BashTool.Name:
+                    var command = param["command"];
+
+                    var processStartInfo = new ProcessStartInfo {
+                        FileName = command,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false
+                    };
+                    var process = Process.Start(processStartInfo);
+                    var output = process!.StandardOutput.ReadToEnd();
+                    var err = process!.StandardError.ReadToEnd();
+
+                    await process.WaitForExitAsync();
+                    if (!string.IsNullOrEmpty(err)) {
+                        messages.Add(new ToolChatMessage(toolCallRequest.Id, $"result: {err}"));
+                    }
+                    else {
+                        messages.Add(new ToolChatMessage(toolCallRequest.Id, $"result: {output}"));
+                    }
                     break;
             }
         }
