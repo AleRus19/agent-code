@@ -70,10 +70,13 @@ while (true) {
                 case BashTool.Name:
                     var command = param["command"];
 
+                    var arguments = command.Split(" ");
+
                     var processStartInfo = new ProcessStartInfo {
-                        WorkingDirectory = ".",
-                        FileName = command,
+                        FileName = arguments[0],
+                        Arguments = arguments[1],
                         RedirectStandardOutput = true,
+                        RedirectStandardError = true,
                         UseShellExecute = false
                     };
                     var process = Process.Start(processStartInfo);
