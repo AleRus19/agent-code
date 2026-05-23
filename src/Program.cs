@@ -73,7 +73,7 @@ while (true) {
                     var processStartInfo = new ProcessStartInfo {
                         FileName = command,
                         RedirectStandardOutput = true,
-                        UseShellExecute = false
+                        UseShellExecute = true
                     };
                     var process = Process.Start(processStartInfo);
                     var output = process!.StandardOutput.ReadToEnd();
