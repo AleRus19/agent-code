@@ -1,8 +1,7 @@
 using System.ClientModel;
-using System.Data.SqlTypes;
+using System.ClientModel.Primitives;
 using System.Diagnostics;
 using OpenAI;
-using OpenAI.Assistants;
 using OpenAI.Chat;
 using static Agent.Tools;
 
@@ -45,6 +44,13 @@ while (true) {
     if (response.FinishReason == ChatFinishReason.Stop) {
         messages.Add(new AssistantChatMessage(response));
         Console.Write(response.Content[0].Text);
+
+        foreach (var m in messages) {
+            if (m is IJsonModel<ChatMessage> jsonModel) {
+                Console.WriteLine(jsonModel.Write(ModelReaderWriterOptions.Json).ToString());
+            }
+        }
+
         return;
     }
 
@@ -62,16 +68,12 @@ while (true) {
                 case WriteTool.Name:
                     var content = param["content"];
                     var path = param["file_path"];
-
                     await File.WriteAllTextAsync(path, content);
-                    messages.Add(new ToolChatMessage(toolCallRequest.Id, $"write successful"));
-
+                    messages.Add(new ToolChatMessage(toolCallRequest.Id, "write successful"));
                     break;
                 case BashTool.Name:
                     var command = param["command"];
-
                     var arguments = command.Split(" ");
-
                     var processStartInfo = new ProcessStartInfo {
                         FileName = arguments[0],
                         Arguments = arguments[1],
@@ -82,7 +84,6 @@ while (true) {
                     var process = Process.Start(processStartInfo);
                     var output = process!.StandardOutput.ReadToEnd();
                     var err = process!.StandardError.ReadToEnd();
-
                     await process.WaitForExitAsync();
                     if (!string.IsNullOrEmpty(err)) {
                         messages.Add(new ToolChatMessage(toolCallRequest.Id, $"result: {err}"));

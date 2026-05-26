@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "CodeCrafters (coreclr)",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/Debug/net9.0/CodeCrafters.ClaudeCode.dll",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "-p",
+                "Aggiungi un Tool al file Tools.cs di greeting"
+            ],
+            "env": {
+                "OPENROUTER_API_KEY": "${env:OPENROUTER_API_KEY}",
+                "OPENROUTER_BASE_URL": "${env:OPENROUTER_BASE_URL}"
+            },
+            "console": "integratedTerminal"
+        }
+    ]
+}
